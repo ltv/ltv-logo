@@ -1,34 +1,46 @@
 # ltv-logo-vue
 
-## Project setup
-```
-yarn install
+The animated [LTV](https://ltv.vn) logo as a Vue 3 component.
+
+```bash
+npm i ltv-logo-vue
 ```
 
-### Compiles and hot-reloads for development
-```
-yarn serve
+```vue
+<script setup lang="ts">
+import LtvLogo from 'ltv-logo-vue';
+</script>
+
+<template>
+  <LtvLogo :size="5" animation="intro" />
+</template>
 ```
 
-### Compiles and minifies for production
-```
-yarn build
+Register globally:
+
+```ts
+import { createApp } from 'vue';
+import { LtvLogoPlugin } from 'ltv-logo-vue';
+
+createApp(App).use(LtvLogoPlugin).mount('#app'); // <LtvLogo> / <ltv-logo>
 ```
 
-### Run your unit tests
-```
-yarn test:unit
-```
+Props:
 
-### Run your end-to-end tests
-```
-yarn test:e2e
-```
+- `size` — `1`…`10`, default `5`
+- `animation` — `pulse` (default), `assemble`, `float`, `intro`, `wave`, `hover`, `none`
+- `title` — accessible name, default `"LTV"`; `""` hides it from assistive tech
 
-### Lints and fixes files
-```
-yarn lint
-```
+Styles are injected on mount. For SSR you can also import
+`ltv-logo-vue/style.css`.
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## Migrating from 1.x (Vue 2)
+
+- Requires Vue 3.3+. The class-component API is gone; the default export is
+  now a regular `defineComponent` component.
+- `ltv-logo-vue.css` is now `ltv-logo-vue/style.css`, and is injected
+  automatically, so the import is optional.
+- The rendered `<svg>` gains `xmlns`, `role="img"` and `aria-label`.
+
+See the [repository README](https://github.com/ltv/ltv-logo#readme) for the
+animation guide and theming.

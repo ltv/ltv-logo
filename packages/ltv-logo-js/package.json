@@ -1,0 +1,51 @@
+{
+  "name": "ltv-logo-js",
+  "version": "1.0.0",
+  "description": "LTV animated logo for plain JavaScript / TypeScript (SVG string, DOM element and <ltv-logo> web component)",
+  "keywords": [
+    "ltv",
+    "logo",
+    "svg",
+    "animation",
+    "web-component"
+  ],
+  "license": "MIT",
+  "author": "Luc Duong",
+  "homepage": "https://github.com/ltv/ltv-logo#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ltv/ltv-logo.git",
+    "directory": "packages/ltv-logo-js"
+  },
+  "type": "module",
+  "sideEffects": [
+    "./dist/ltv-logo.iife.js",
+    "*.css"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "unpkg": "./dist/ltv-logo.iife.js",
+  "jsdelivr": "./dist/ltv-logo.iife.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./style.css": "./dist/style.css",
+    "./iife": "./dist/ltv-logo.iife.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "bun scripts/build.ts",
+    "dev": "bun --hot demo/index.html",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

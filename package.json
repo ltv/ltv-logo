@@ -1,0 +1,30 @@
+{
+  "name": "ltv-logo-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "LTV animated logo for vanilla JS/TS, Vue and React",
+  "packageManager": "bun@1.4.4",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "bun run --filter 'ltv-logo-js' build && bun run --filter 'ltv-logo-vue' --filter 'ltv-logo-react' build",
+    "typecheck": "bun run --filter '*' typecheck && tsc -p tsconfig.scripts.json",
+    "test": "bun test",
+    "check": "bun run format:check && bun run build && bun run typecheck && bun test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "dev:js": "bun --cwd packages/ltv-logo-js dev",
+    "dev:vue": "bun --cwd packages/ltv-logo-vue dev",
+    "dev:react": "bun --cwd packages/ltv-logo-react dev",
+    "version:bump": "bun scripts/bump-version.ts",
+    "playground": "bun run --filter ltv-logo-js build && bun scripts/playground.ts"
+  },
+  "devDependencies": {
+    "@happy-dom/global-registrator": "^21.0.4",
+    "@types/bun": "^1.4.4",
+    "prettier": "^3.10.1",
+    "typescript": "^7.0.2"
+  }
+}

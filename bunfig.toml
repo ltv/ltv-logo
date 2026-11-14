@@ -1,0 +1,6 @@
+[install]
+# Reproducible installs in CI: `bun install --frozen-lockfile`
+exact = false
+
+[test]
+preload = ["./scripts/test-setup.ts"]
