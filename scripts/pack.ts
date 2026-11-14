@@ -14,10 +14,56 @@ await mkdir(out, { recursive: true });
 const dirs = await readdir(join(root, 'packages'), { withFileTypes: true });
 const tarballs: string[] = [];
 
-for (const dir of dirs.filter((d) => d.isDirectory())) {
+interface Workspace {
+  dir: string;
+  pkg: {
+    name: string;
+    private?: boolean;
+    dependencies?: Record<string, string>;
+  };
+}
+const workspaces: Workspace[] = [];
+for (const d of dirs.filter((d) => d.isDirectory())) {
+  const pkg = await Bun.file(
+    join(root, 'packages', d.name, 'package.json')
+  ).json();
+  if (!pkg.private) workspaces.push({ dir: d.name, pkg });
+}
+
+/**
+ * Dependency order: a package comes after the workspace packages it depends
+ * on, so the release publishes `ltv-logo-js` before `ltv-logo-vue` and
+ * `ltv-logo-react` and never leaves a published version pointing at an
+ * unpublished one.
+ */
+function dependencyOrder(list: Workspace[]): Workspace[] {
+  const names = new Set(list.map((w) => w.pkg.name));
+  const done = new Set<string>();
+  const ordered: Workspace[] = [];
+  const visit = (w: Workspace, path: string[] = []) => {
+    if (done.has(w.pkg.name)) return;
+    if (path.includes(w.pkg.name)) {
+      throw new Error(
+        `Workspace dependency cycle: ${[...path, w.pkg.name].join(' → ')}`
+      );
+    }
+    for (const dep of Object.keys(w.pkg.dependencies ?? {})) {
+      const target = list.find((x) => x.pkg.name === dep);
+      if (target && names.has(dep)) visit(target, [...path, w.pkg.name]);
+    }
+    done.add(w.pkg.name);
+    ordered.push(w);
+  };
+  for (const w of [...list].sort((a, b) =>
+    a.pkg.name.localeCompare(b.pkg.name)
+  ))
+    visit(w);
+  return ordered;
+}
+
+for (const { dir: dirName, pkg } of dependencyOrder(workspaces)) {
+  const dir = { name: dirName };
   const cwd = join(root, 'packages', dir.name);
-  const pkg = await Bun.file(join(cwd, 'package.json')).json();
-  if (pkg.private) continue;
 
   const pack = Bun.spawnSync(
     ['bun', 'pm', 'pack', '--quiet', '--destination', out],
