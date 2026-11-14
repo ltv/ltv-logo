@@ -1,0 +1,59 @@
+{
+  "name": "ltv-logo-react",
+  "version": "1.0.0",
+  "description": "LTV animated logo component for React",
+  "keywords": [
+    "ltv",
+    "logo",
+    "svg",
+    "animation",
+    "react"
+  ],
+  "license": "MIT",
+  "author": "Luc Duong",
+  "homepage": "https://github.com/ltv/ltv-logo#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ltv/ltv-logo.git",
+    "directory": "packages/ltv-logo-react"
+  },
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./style.css": "./dist/style.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "bun scripts/build.ts",
+    "dev": "bun --hot demo/index.html",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "ltv-logo-js": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

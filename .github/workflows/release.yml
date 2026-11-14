@@ -1,0 +1,158 @@
+name: Release
+
+# Manually triggered: bumps all packages (lockstep, SemVer), tags vX.Y.Z,
+# publishes to npm with provenance and creates a GitHub Release.
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: Version bump (SemVer)
+        type: choice
+        default: patch
+        options:
+          - patch
+          - minor
+          - major
+          - prepatch
+          - preminor
+          - premajor
+          - prerelease
+      version:
+        description: Explicit version instead of a bump, e.g. 2.0.0 (optional)
+        type: string
+        required: false
+      preid:
+        description: Pre-release identifier for pre* bumps (beta, rc, alpha…)
+        type: string
+        default: beta
+      dry_run:
+        description: Dry run (build + npm publish --dry-run, nothing pushed)
+        type: boolean
+        default: false
+
+permissions:
+  contents: write # push the release commit + tag, create the GitHub Release
+  id-token: write # npm provenance / trusted publishing
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    env:
+      RELEASE: ${{ inputs.version || inputs.release }}
+      PREID: ${{ inputs.preid }}
+      DRY_RUN: ${{ inputs.dry_run }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - run: bun install --frozen-lockfile
+
+      - name: Bump version
+        id: version
+        run: bun scripts/bump-version.ts "$RELEASE" --preid "$PREID"
+
+      - name: Refresh lockfile with the new workspace versions
+        run: bun install --lockfile-only
+
+      - name: Ensure the tag is new
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null || \
+             git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null; then
+            echo "::error::Tag $TAG already exists"
+            exit 1
+          fi
+
+      - run: bun run format:check
+      - run: bun run build
+      - run: bun run typecheck
+      - run: bun test
+
+      - name: Pack
+        id: pack
+        run: |
+          {
+            echo 'tarballs<<EOF'
+            bun scripts/pack.ts
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Commit and tag
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "chore(release): $TAG"
+          git tag -a "$TAG" -m "$TAG"
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TAG: ${{ steps.version.outputs.npm_tag }}
+          VERSION: ${{ steps.version.outputs.version }}
+          TARBALLS: ${{ steps.pack.outputs.tarballs }}
+        run: |
+          set -euo pipefail
+          while IFS= read -r tarball; do
+            [ -n "$tarball" ] || continue
+            name=$(tar -xOzf "$tarball" package/package.json | node -p 'JSON.parse(require("fs").readFileSync(0)).name')
+            if npm view "$name@$VERSION" version >/dev/null 2>&1; then
+              echo "$name@$VERSION is already published, skipping"
+              continue
+            fi
+            args=(--access public --tag "$NPM_TAG")
+            if [ "$DRY_RUN" = "true" ]; then args+=(--dry-run); else args+=(--provenance); fi
+            echo "Publishing $name@$VERSION (dist-tag: $NPM_TAG)"
+            npm publish "$tarball" "${args[@]}"
+          done <<< "$TARBALLS"
+
+      - name: Push commit and tag
+        if: inputs.dry_run != true
+        run: git push origin "HEAD:${GITHUB_REF_NAME}" --follow-tags
+
+      - name: Create GitHub Release
+        if: inputs.dry_run != true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+          PREVIOUS: v${{ steps.version.outputs.previous }}
+          PRERELEASE: ${{ steps.version.outputs.prerelease }}
+        run: |
+          args=(--title "$TAG" --generate-notes --verify-tag)
+          if git rev-parse -q --verify "refs/tags/$PREVIOUS" >/dev/null; then
+            args+=(--notes-start-tag "$PREVIOUS")
+          fi
+          if [ "$PRERELEASE" = "true" ]; then args+=(--prerelease); else args+=(--latest); fi
+          gh release create "$TAG" .release/*.tgz "${args[@]}"
+
+      - name: Summary
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+          NPM_TAG: ${{ steps.version.outputs.npm_tag }}
+        run: |
+          {
+            if [ "$DRY_RUN" = "true" ]; then echo "### $TAG (dry run)"; else echo "### $TAG"; fi
+            echo ""
+            echo "npm dist-tag: \`$NPM_TAG\`"
+            echo ""
+            echo '```'
+            ls -1 .release
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
