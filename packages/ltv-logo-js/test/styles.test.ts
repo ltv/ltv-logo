@@ -15,10 +15,15 @@ describe('styles', () => {
     }
   });
 
-  test('defines one animation per letter', () => {
+  test('defines one legacy pulse animation per letter', () => {
     for (const letter of ['L', 'T', 'V']) {
       expect(styles).toContain(`@keyframes logo-am-${letter} {`);
     }
+  });
+
+  test('converge tones can be themed with CSS variables', () => {
+    expect(styles).toContain('var(--ltv-logo-primary, #3369e8)');
+    expect(styles).toContain('var(--ltv-logo-accent, #eeb211)');
   });
 
   test('is deterministic', () => expect(buildStyles()).toBe(styles));

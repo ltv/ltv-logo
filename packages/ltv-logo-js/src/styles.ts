@@ -1,4 +1,10 @@
-import { COLORS, LOGO_CLASS, MAX_SIZE, STYLE_ELEMENT_ID } from './constants.js';
+import {
+  LEGACY_COLORS as COLORS,
+  LOGO_CLASS,
+  MAX_SIZE,
+  STYLE_ELEMENT_ID
+} from './constants.js';
+import { buildConvergeStyles } from './converge.js';
 import type { LogoLetter } from './constants.js';
 
 interface Shape {
@@ -311,7 +317,8 @@ const indent = (css: string) =>
     .join('\n');
 
 /**
- * Builds the complete stylesheet for the logo. The same CSS is published as
+ * Builds the complete stylesheet: the legacy mark first (unchanged since
+ * 1.x), then the converge mark. The same CSS is published as
  * `ltv-logo-js/style.css`.
  */
 export function buildStyles(): string {
@@ -336,7 +343,7 @@ export function buildStyles(): string {
     ...ORDER.flatMap(letterRules),
     ...variantStyles()
   ];
-  return `${blocks.join('\n')}\n`;
+  return `${blocks.join('\n')}\n${buildConvergeStyles()}`;
 }
 
 /** The logo stylesheet as a string. */

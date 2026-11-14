@@ -23,7 +23,7 @@ bun add ltv-logo-react  # React
 ```html
 <!-- No build step -->
 <script src="https://unpkg.com/ltv-logo-js"></script>
-<ltv-logo size="5" animation="intro"></ltv-logo>
+<ltv-logo size="5" animation="greet"></ltv-logo>
 ```
 
 ```vue
@@ -32,14 +32,14 @@ import LtvLogo from 'ltv-logo-vue';
 </script>
 
 <template>
-  <LtvLogo :size="5" animation="intro" />
+  <LtvLogo :size="5" animation="greet" />
 </template>
 ```
 
 ```tsx
 import LtvLogo from 'ltv-logo-react';
 
-export const Header = () => <LtvLogo size={5} animation="intro" />;
+export const Header = () => <LtvLogo size={5} animation="greet" />;
 ```
 
 Styles are injected automatically on mount. To ship them as a stylesheet
@@ -47,51 +47,97 @@ instead (for example for SSR without a flash), import
 `ltv-logo-js/style.css` (also re-exported as `ltv-logo-vue/style.css` and
 `ltv-logo-react/style.css`).
 
+## The mark
+
+The **Hội tụ** mark (2026): three 90° round-capped strokes pointing at one
+centre, rotated 120° apart — two blue (`brand`), the top one yellow
+(`spark`). Built on a 120 × 120 grid (stroke 16, arms 32, vertices 14 from
+the centre), every stroke end inside a circle of radius 52, so it sits
+centred in square, round and rectangular frames.
+
+The yellow stroke reads as raised arms and the blue strokes as legs, so the
+animations treat the mark as a small agent character.
+
+The original L·T·V mark (2015–2026) is still available as `mark="legacy"`.
+
 ## Options
 
 | Option | Values | Default |
 | --- | --- | --- |
-| `size` | `1` (smallest) … `10` (largest). Out-of-range values are clamped. | `5` |
-| `animation` | `pulse`, `assemble`, `float`, `intro`, `wave`, `hover`, `none` | `pulse` |
+| `mark` | `converge`, `legacy` | `converge` |
+| `size` | `1` … `10`, clamped. Converge: `size × 16` px square (5 → 80 px). Legacy: the 1.x scale. | `5` |
+| `animation` | See below; depends on `mark` | `assemble` / `pulse` |
+| `tone` (converge) | `color`, `dark`, `mono`, `white` | `color` |
 | `title` (`label` attribute on `<ltv-logo>`) | Accessible name. `""` hides the logo from assistive tech. | `"LTV"` |
 
-### Animations
+### Tones (converge)
 
-| Name | What it does | Use it for |
+| Tone | Use |
+| --- | --- |
+| `color` | Light backgrounds, 48 px and up |
+| `dark` | Dark backgrounds (lighter blue and yellow) |
+| `mono` | Icons and favicons ≤ 32 px on light backgrounds, single-colour print |
+| `white` | On blue or photographic backgrounds |
+
+### Animations (converge)
+
+| Name | What the agent does | Use it for |
 | --- | --- | --- |
-| `pulse` | The original loop: letters converge and spread | Default, backwards compatible |
-| `assemble` | Letters fly in from their own direction and settle once (800 ms, staggered 90 ms) | Splash screen, first view |
-| `float` | Each letter drifts slowly, out of phase | Hero sections |
-| `intro` | `assemble`, then `float` | The most expressive option |
-| `wave` | Letters bob one after another (1.4 s loop) | Loading indicator |
-| `hover` | Static; letters spread slightly on hover / keyboard focus | Logo link in a header |
-| `none` | Static brand mark | Print, footers |
+| `assemble` | The strokes fly in along their own axis and lock (800 ms, once) | Default, first view |
+| `idle` | Breathes: arms rise a little, legs settle (3.2 s loop) | Ambient, hero sections |
+| `greet` | Waves hello with its arms | Welcome screens, chat greeting |
+| `cheer` | Crouches, jumps and lands | A task just finished |
+| `work` | Turns a third at a time (120° gives the same shape), pausing between | Loading / busy indicator |
+| `hover` | Static; perks up on hover or keyboard focus | Logo link in a header |
+| `none` | Static mark | Print, footers |
 
-All animations use only `transform` / `opacity` (GPU-friendly) and respect
-`prefers-reduced-motion`: loops become a gentle opacity pulse, entrances
-become a short fade, and ambient / hover motion is turned off.
+### Animations (legacy)
 
-Colours can be themed with CSS custom properties:
+`pulse` (default, the 1.x loop), `assemble`, `float`, `intro`, `wave`,
+`hover`, `none`.
+
+All animations use only `transform` / `opacity` and respect
+`prefers-reduced-motion`: loops stop (the `work` loader keeps a gentle
+opacity pulse so "busy" stays visible), entrances become a short fade, and
+hover motion is off.
+
+### Theming
 
 ```css
-svg.logo {
-  --ltv-logo-l: #3369e8; /* blue  */
-  --ltv-logo-v: #f4b400; /* yellow */
-  --ltv-logo-t: #0f9d58; /* green */
+svg.ltv-mark {
+  --ltv-logo-primary: #3369e8; /* legs (blue) */
+  --ltv-logo-accent: #eeb211; /* arms (yellow) */
+  --ltv-logo-primary-dark: #6b93f0; /* tone="dark" */
+  --ltv-logo-accent-dark: #f2c240;
 }
 ```
+
+The wordmark next to the mark is "LTV" set in Sora 700, colour `#364c79`
+(`#a3bef2` on dark) — see the LTV Design System.
 
 ### Rendered HTML
 
 ```html
-<svg xmlns="http://www.w3.org/2000/svg" class="logo size-5 logo-anim-intro" role="img" aria-label="LTV">
-  <g class="logo-wrapper">
-    <g class="logo-letter V"><rect /><rect /></g>
-    <g class="logo-letter L"><rect /><rect /></g>
-    <g class="logo-letter T"><rect /><rect /></g>
+<svg xmlns="http://www.w3.org/2000/svg" class="ltv-mark ltv-anim-assemble ltv-tone-color"
+     viewBox="0 0 120 120" width="80" height="80" role="img" aria-label="LTV">
+  <g class="ltv-figure" fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <polyline class="ltv-stroke ltv-arms" points="37.37,23.37 60,46 82.63,23.37" stroke="#eeb211" />
+    <polyline class="ltv-stroke ltv-leg ltv-leg-r" points="103.03,58.72 72.12,67 80.41,97.91" stroke="#3369e8" />
+    <polyline class="ltv-stroke ltv-leg ltv-leg-l" points="39.59,97.91 47.88,67 16.97,58.72" stroke="#3369e8" />
   </g>
 </svg>
 ```
+
+Stroke colours are also set as attributes, so the mark renders correctly
+even without the stylesheet.
+
+## Migrating from 1.x
+
+- The default mark is now `converge`. Pass `mark="legacy"` to keep the
+  L·T·V logo and its animations exactly as before.
+- `LOGO_ANIMATIONS` is now `{ converge: [...], legacy: [...] }`; use
+  `CONVERGE_ANIMATIONS` / `LEGACY_ANIMATIONS` for flat lists.
+- `ltv-logo-vue` requires Vue 3.3+ (see its README).
 
 ## Development
 

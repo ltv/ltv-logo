@@ -12,7 +12,7 @@ npm i ltv-logo-js
 
 ```html
 <script src="https://unpkg.com/ltv-logo-js"></script>
-<ltv-logo size="5" animation="intro"></ltv-logo>
+<ltv-logo size="5" animation="greet"></ltv-logo>
 ```
 
 With a bundler:
@@ -23,14 +23,14 @@ import { defineLtvLogoElement } from 'ltv-logo-js';
 defineLtvLogoElement(); // registers <ltv-logo>
 ```
 
-Attributes: `size` (1–10), `animation`, `label`.
+Attributes: `mark`, `size` (1–10), `animation`, `tone`, `label`.
 
 ## DOM
 
 ```ts
 import { mountLogo, createLogoElement, updateLogoElement } from 'ltv-logo-js';
 
-const svg = mountLogo('#app', { size: 3, animation: 'assemble' });
+const svg = mountLogo('#app', { size: 3, animation: 'greet' });
 updateLogoElement(svg, { size: 8, animation: 'float' });
 ```
 
@@ -39,15 +39,17 @@ updateLogoElement(svg, { size: 8, animation: 'float' });
 ```ts
 import { renderLogo, styles } from 'ltv-logo-js';
 
-const html = `<style>${styles}</style>${renderLogo({ size: 5, animation: 'wave' })}`;
+const html = `<style>${styles}</style>${renderLogo({ size: 5, animation: 'work' })}`;
 ```
 
 Or import the stylesheet: `import 'ltv-logo-js/style.css'`.
 
 ## Options
 
-- `size` — `1`…`10`, default `5`
-- `animation` — `pulse` (default), `assemble`, `float`, `intro`, `wave`, `hover`, `none`
+- `mark` — `converge` (Hội tụ, default) or `legacy` (the 1.x L·T·V mark)
+- `size` — `1`…`10`, default `5` (converge: size × 16 px)
+- `tone` — converge only: `color` (default), `dark`, `mono`, `white`
+- `animation` — converge: `assemble` (default), `idle`, `greet`, `cheer`, `work`, `hover`, `none`; legacy: `pulse` (default), `assemble`, `float`, `intro`, `wave`, `hover`, `none`
 - `title` — accessible name, default `"LTV"`; `""` hides it from assistive tech
 - `className` — extra classes
 

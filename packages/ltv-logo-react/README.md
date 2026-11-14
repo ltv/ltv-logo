@@ -12,7 +12,7 @@ import LtvLogo from 'ltv-logo-react';
 export function Header() {
   return (
     <a href="/" aria-label="Home">
-      <LtvLogo size={3} animation="hover" title="" />
+      <LtvLogo size={2} animation="hover" title="" />
     </a>
   );
 }
@@ -20,8 +20,10 @@ export function Header() {
 
 Props:
 
-- `size` — `1`…`10`, default `5`
-- `animation` — `pulse` (default), `assemble`, `float`, `intro`, `wave`, `hover`, `none`
+- `mark` — `converge` (Hội tụ, default) or `legacy` (the 1.x L·T·V mark)
+- `size` — `1`…`10`, default `5` (converge: size × 16 px)
+- `tone` — converge only: `color` (default), `dark`, `mono`, `white`
+- `animation` — converge: `assemble` (default), `idle`, `greet`, `cheer`, `work`, `hover`, `none`; legacy: `pulse` (default), `assemble`, `float`, `intro`, `wave`, `hover`, `none`
 - `title` — accessible name, default `"LTV"`; `""` hides it from assistive tech
 - any other SVG prop (`className`, `style`, `ref`, `onClick`, …) is forwarded
 

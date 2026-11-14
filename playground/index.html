@@ -4,24 +4,30 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>LTV Logo Playground</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap"
+    />
     <style>
       :root {
-        --bg: #f7f7f5;
+        --bg: #f7f8fb;
         --surface: #ffffff;
-        --border: #e4e4e0;
-        --text: #1d1d1b;
-        --muted: #6b6b66;
+        --border: #d9e0ee;
+        --text: #0b1326;
+        --muted: #4a5775;
         --accent: #3369e8;
+        --wordmark: #364c79;
         --radius: 14px;
         color-scheme: light;
       }
       :root[data-theme='dark'] {
-        --bg: #111214;
-        --surface: #1a1b1e;
-        --border: #2c2d31;
-        --text: #f1f1ee;
-        --muted: #9a9a95;
-        --accent: #7aa2ff;
+        --bg: #060b18;
+        --surface: #0b1326;
+        --border: #243252;
+        --text: #eef2fb;
+        --muted: #a7b4cf;
+        --accent: #6b93f0;
+        --wordmark: #a3bef2;
         color-scheme: dark;
       }
       * {
@@ -32,10 +38,8 @@
         background: var(--bg);
         color: var(--text);
         font:
-          15px/1.5 system-ui,
-          -apple-system,
-          'Segoe UI',
-          Roboto,
+          15px/1.5 'IBM Plex Sans',
+          system-ui,
           sans-serif;
       }
       main {
@@ -45,20 +49,24 @@
       }
       header {
         display: flex;
-        flex-wrap: wrap;
-        align-items: end;
-        justify-content: space-between;
+        align-items: center;
         gap: 16px;
         margin-bottom: 24px;
       }
-      h1 {
+      header h1 {
         margin: 0;
         font-size: 28px;
         letter-spacing: -0.02em;
       }
       header p {
-        margin: 4px 0 0;
+        margin: 2px 0 0;
         color: var(--muted);
+      }
+      .wordmark {
+        font-family: Sora, system-ui, sans-serif;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--wordmark);
       }
       .controls {
         display: flex;
@@ -81,7 +89,7 @@
         color: var(--muted);
         font-size: 14px;
       }
-      .controls .spacer {
+      .spacer {
         flex: 1;
       }
       button,
@@ -131,23 +139,21 @@
         height: 220px;
         border-bottom: 1px solid var(--border);
         overflow: hidden;
+        display: grid;
+        place-items: center;
       }
-      /* The logo keeps its default 300×150 SVG box; the size-N class scales
-         and shifts the mark inside it. JS offsets the box so the visible
-         mark is centred (see centre()). */
-      .stage > * {
+      .stage.legacy > * {
         position: absolute;
-        display: block;
         width: 300px;
         height: 150px;
       }
       .stage a {
+        display: block;
         border-radius: 12px;
         outline-offset: 4px;
       }
-      .stage svg.logo {
+      .stage svg {
         display: block;
-        overflow: visible;
       }
       .meta {
         padding: 12px 16px 16px;
@@ -161,6 +167,7 @@
         font-size: 16px;
       }
       .meta code {
+        font-family: 'IBM Plex Mono', monospace;
         font-size: 13px;
         color: var(--accent);
       }
@@ -183,24 +190,27 @@
       }
       .usage .card {
         padding: 16px;
+        gap: 12px;
       }
       .usage h3 {
-        margin: 0 0 8px;
+        margin: 0;
         font-size: 15px;
       }
       .usage .row {
         display: flex;
         align-items: center;
         gap: 12px;
-        min-height: 80px;
+        min-height: 72px;
       }
       pre {
-        margin: 12px 0 0;
+        margin: 0;
         padding: 12px;
         background: var(--bg);
         border-radius: 8px;
         overflow: auto;
-        font-size: 12.5px;
+        font:
+          12.5px/1.5 'IBM Plex Mono',
+          monospace;
       }
       .note {
         color: var(--muted);
@@ -217,17 +227,37 @@
   <body>
     <main>
       <header>
+        <ltv-logo size="4" animation="greet" label="LTV"></ltv-logo>
         <div>
-          <h1>LTV Logo Playground</h1>
-          <p>Every animation from <code>ltv-logo-js</code>, rendered live.</p>
+          <h1><span class="wordmark">LTV</span> logo playground</h1>
+          <p>
+            The Hội tụ mark moves like a small agent: arms up, two legs. Every
+            animation from <code>ltv-logo-js</code>, rendered live.
+          </p>
         </div>
       </header>
 
       <div class="controls" role="toolbar" aria-label="Playground controls">
         <label>
+          Mark
+          <select id="mark">
+            <option value="converge">Hội tụ (converge)</option>
+            <option value="legacy">Legacy (L·T·V)</option>
+          </select>
+        </label>
+        <label id="tone-label">
+          Tone
+          <select id="tone">
+            <option value="color">color</option>
+            <option value="dark">dark</option>
+            <option value="mono">mono</option>
+            <option value="white">white</option>
+          </select>
+        </label>
+        <label>
           Size
-          <input id="size" type="range" min="1" max="10" value="5" />
-          <output id="size-out">5</output>
+          <input id="size" type="range" min="1" max="10" value="7" />
+          <output id="size-out">7</output>
         </label>
         <label>
           Speed
@@ -249,31 +279,49 @@
       <div id="grid" class="grid"></div>
 
       <section>
-        <h2>Usage</h2>
+        <h2>The agent at work</h2>
         <div class="usage">
           <div class="card">
-            <h3>Web component</h3>
+            <h3>Loader</h3>
             <div class="row">
-              <ltv-logo size="2" animation="wave" label="Loading"></ltv-logo>
-              <span class="note">&lt;ltv-logo&gt; as a loading indicator</span>
+              <ltv-logo size="3" animation="work" label="Loading"></ltv-logo>
+              <span class="note">Agent đang xử lý yêu cầu…</span>
             </div>
             <pre>
-&lt;script src="https://unpkg.com/ltv-logo-js"&gt;&lt;/script&gt;
-&lt;ltv-logo size="5" animation="intro"&gt;&lt;/ltv-logo&gt;</pre>
+&lt;ltv-logo size="3" animation="work" label="Loading"&gt;&lt;/ltv-logo&gt;</pre>
           </div>
           <div class="card">
-            <h3>Vanilla JS</h3>
-            <div class="row" id="vanilla-target"></div>
+            <h3>Task done</h3>
+            <div class="row">
+              <ltv-logo size="3" animation="cheer" label="Done"></ltv-logo>
+              <span class="note">Đã phân loại 128 email.</span>
+            </div>
+            <pre>&lt;LtvLogo size={3} animation="cheer" /&gt;</pre>
+          </div>
+          <div class="card">
+            <h3>Header link</h3>
+            <div class="row">
+              <a
+                href="#"
+                id="header-link"
+                aria-label="LTV home"
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  text-decoration: none;
+                  border-radius: 8px;
+                  outline-offset: 4px;
+                "
+              >
+                <ltv-logo size="2" animation="hover" label=""></ltv-logo>
+                <span class="wordmark" style="font-size: 24px">LTV</span>
+              </a>
+              <span class="note">Hover or Tab to it</span>
+            </div>
             <pre>
 import { mountLogo } from 'ltv-logo-js';
-mountLogo('#app', { size: 3, animation: 'assemble' });</pre>
-          </div>
-          <div class="card">
-            <h3>HTML string (SSR)</h3>
-            <div class="row" id="string-target"></div>
-            <pre>
-import { renderLogo, styles } from 'ltv-logo-js';
-const html = renderLogo({ size: 3, animation: 'float' });</pre>
+mountLogo('#logo', { size: 2, animation: 'hover' });</pre>
           </div>
         </div>
       </section>
@@ -288,50 +336,73 @@ const html = renderLogo({ size: 3, animation: 'float' });</pre>
             '<p class="error">dist/ltv-logo.iife.js not found. Run <code>bun run build</code> at the repository root, then reload.</p>';
           return;
         }
-
         var L = window.LtvLogo;
         var DESCRIPTIONS = {
-          pulse: 'The original loop: letters converge and spread. Default.',
-          assemble:
-            'Entrance: letters fly in from their own direction and settle once. For a splash or first view.',
-          float:
-            'Ambient: each letter drifts slowly out of phase. For hero sections.',
-          intro: 'assemble, then float. The most expressive option.',
-          wave: 'Letters bob one after another. Use it as a loader.',
-          hover:
-            'Static; letters spread slightly on hover or keyboard focus. For a header logo link.',
-          none: 'The static brand mark.'
+          converge: {
+            assemble:
+              'Default. The three strokes fly in along their own axis and lock together, once.',
+            idle: 'Breathing: the arms rise a little, the legs settle. Calm ambient loop.',
+            greet:
+              'Waves hello with its arms. For a welcome screen or chat greeting.',
+            cheer: 'Crouches, jumps and lands. Use it when a task finishes.',
+            work: 'Turns a third at a time (120° gives the same shape), pausing between. A loader.',
+            hover:
+              'Static; perks up on hover or keyboard focus. For a header logo link.',
+            none: 'The static mark.'
+          },
+          legacy: {
+            pulse: 'The original 1.x loop: letters converge and spread.',
+            assemble:
+              'Letters fly in from their own direction and settle once.',
+            float: 'Each letter drifts slowly, out of phase.',
+            intro: 'assemble, then float.',
+            wave: 'Letters bob one after another.',
+            hover: 'Static; letters spread on hover or keyboard focus.',
+            none: 'The static legacy mark.'
+          }
         };
 
-        var state = { size: 5, speed: 1 };
+        var state = { mark: 'converge', tone: 'color', size: 7, speed: 1 };
         var grid = document.getElementById('grid');
 
-        function logo(animation) {
-          var svg = L.createLogoElement({
-            size: state.size,
+        function options(animation) {
+          return {
+            mark: state.mark,
+            size:
+              state.mark === 'legacy'
+                ? Math.max(1, state.size - 2)
+                : state.size,
+            tone: state.tone,
             animation: animation
-          });
-          if (animation === 'hover') {
-            var a = document.createElement('a');
-            a.href = '#';
-            a.setAttribute('aria-label', 'LTV home (hover or Tab to focus)');
-            a.addEventListener('click', function (e) {
-              e.preventDefault();
-            });
-            a.appendChild(svg);
-            return a;
-          }
-          return svg;
+          };
         }
 
-        // Offset of the static mark inside its 300×150 SVG box, per size.
+        function logo(animation) {
+          var svg = L.createLogoElement(options(animation));
+          if (animation !== 'hover') return svg;
+          var a = document.createElement('a');
+          a.href = '#';
+          a.setAttribute('aria-label', 'LTV home (hover or Tab to focus)');
+          a.addEventListener('click', function (e) {
+            e.preventDefault();
+          });
+          a.appendChild(svg);
+          return a;
+        }
+
+        // The legacy mark keeps its 1.x sizing (a scaled 300×150 box), so it
+        // is centred by measuring the static mark once per size.
         var boxCache = {};
-        function markBox(size) {
+        function legacyBox(size) {
           if (boxCache[size]) return boxCache[size];
           var probe = document.createElement('div');
           probe.style.cssText =
             'position:absolute;left:-9999px;top:0;width:300px;height:150px';
-          var svg = L.createLogoElement({ size: size, animation: 'none' });
+          var svg = L.createLogoElement({
+            mark: 'legacy',
+            size: size,
+            animation: 'none'
+          });
           svg.style.overflow = 'visible';
           probe.appendChild(svg);
           document.body.appendChild(probe);
@@ -350,8 +421,8 @@ const html = renderLogo({ size: 3, animation: 'float' });</pre>
 
         function centre(stage) {
           var el = stage.firstElementChild;
-          if (!el) return;
-          var box = markBox(state.size);
+          if (!el || state.mark !== 'legacy') return;
+          var box = legacyBox(options().size);
           el.style.left = (stage.clientWidth - box.w) / 2 - box.x + 'px';
           el.style.top = (stage.clientHeight - box.h) / 2 - box.y + 'px';
         }
@@ -363,17 +434,24 @@ const html = renderLogo({ size: 3, animation: 'float' });</pre>
           });
         }
 
+        function stageBackground() {
+          return state.mark === 'converge' && state.tone === 'white'
+            ? '#3369e8'
+            : '';
+        }
+
         function renderCard(animation) {
           var card = document.createElement('article');
           card.className = 'card';
           card.innerHTML =
-            '<div class="stage"></div>' +
-            '<div class="meta"><div><h2><code>' +
+            '<div class="stage"></div><div class="meta"><div><h2><code>' +
             animation +
             '</code></h2><p>' +
-            DESCRIPTIONS[animation] +
+            DESCRIPTIONS[state.mark][animation] +
             '</p></div><button type="button">Replay</button></div>';
           var stage = card.querySelector('.stage');
+          stage.classList.toggle('legacy', state.mark === 'legacy');
+          stage.style.background = stageBackground();
           var replay = function () {
             stage.replaceChildren(logo(animation));
             centre(stage);
@@ -385,63 +463,70 @@ const html = renderLogo({ size: 3, animation: 'float' });</pre>
         }
 
         function renderAll() {
-          grid.replaceChildren.apply(grid, L.LOGO_ANIMATIONS.map(renderCard));
+          document.getElementById('tone-label').hidden =
+            state.mark !== 'converge';
+          grid.replaceChildren.apply(
+            grid,
+            L.LOGO_ANIMATIONS[state.mark].map(renderCard)
+          );
           grid.querySelectorAll('.stage').forEach(centre);
           requestAnimationFrame(applySpeed);
         }
 
-        // Usage examples
-        L.injectStyles();
-        L.mountLogo('#vanilla-target', { size: 3, animation: 'assemble' });
-        document.getElementById('string-target').innerHTML = L.renderLogo({
-          size: 3,
-          animation: 'float'
-        });
-        document.querySelectorAll('.usage svg.logo').forEach(function (svg) {
-          svg.style.width = '120px';
-          svg.style.height = '80px';
-          svg.style.overflow = 'visible';
-        });
-
-        // Controls
+        document
+          .getElementById('mark')
+          .addEventListener('change', function (e) {
+            state.mark = e.target.value;
+            renderAll();
+          });
+        document
+          .getElementById('tone')
+          .addEventListener('change', function (e) {
+            state.tone = e.target.value;
+            renderAll();
+          });
         var size = document.getElementById('size');
         size.addEventListener('input', function () {
           state.size = Number(size.value);
           document.getElementById('size-out').textContent = size.value;
-          grid.querySelectorAll('svg.logo').forEach(function (svg, i) {
-            L.updateLogoElement(svg, {
-              size: state.size,
-              animation: L.LOGO_ANIMATIONS[i]
-            });
+          grid.querySelectorAll('.stage svg').forEach(function (svg, i) {
+            L.updateLogoElement(svg, options(L.LOGO_ANIMATIONS[state.mark][i]));
           });
           grid.querySelectorAll('.stage').forEach(centre);
         });
-
         document
           .getElementById('speed')
           .addEventListener('change', function (e) {
             state.speed = Number(e.target.value);
             applySpeed();
           });
-
         document.getElementById('replay').addEventListener('click', renderAll);
+        document
+          .getElementById('header-link')
+          .addEventListener('click', function (e) {
+            e.preventDefault();
+          });
 
         // Reduced motion simulation: re-scope the library's own
         // `prefers-reduced-motion: reduce` rules under `.force-reduced`.
         var reducedStyle = document.createElement('style');
-        var match = L.styles.match(
-          /@media \(prefers-reduced-motion: reduce\) \{([\s\S]*)\}\s*$/
-        );
+        var blocks = L.styles
+          .split('@media (prefers-reduced-motion: reduce) {')
+          .slice(1);
         var reducedCss =
-          (match
-            ? match[1].replace(
-                /(^|,|\})\s*svg\.logo/g,
-                '$1 .force-reduced svg.logo'
-              )
-            : '') +
-          // The real hover rule is gated by (prefers-reduced-motion:
-          // no-preference), which still matches here, so cancel it explicitly.
-          '.force-reduced svg.logo .logo-wrapper .logo-letter { translate: none !important; }';
+          blocks
+            .map(function (block) {
+              // Each block ends at the first line that is a lone "}".
+              var body = block.slice(0, block.search(/\n\}/));
+              return body.replace(
+                /(^|,|\})\s*(svg\.)/g,
+                '$1 .force-reduced $2'
+              );
+            })
+            .join('\n') +
+          // Hover motion is gated by (prefers-reduced-motion: no-preference),
+          // which still matches here, so cancel it explicitly.
+          '.force-reduced svg .ltv-stroke, .force-reduced svg .logo-letter { translate: none !important; }';
         var reducedBtn = document.getElementById('reduced');
         reducedBtn.addEventListener('click', function () {
           var on = reducedBtn.getAttribute('aria-pressed') !== 'true';
@@ -461,6 +546,15 @@ const html = renderLogo({ size: 3, animation: 'float' });</pre>
             'data-theme',
             dark ? 'dark' : 'light'
           );
+          var tone = document.getElementById('tone');
+          if (dark && state.tone === 'color') tone.value = state.tone = 'dark';
+          if (!dark && state.tone === 'dark') tone.value = state.tone = 'color';
+          document
+            .querySelectorAll('header ltv-logo, .usage ltv-logo')
+            .forEach(function (el) {
+              el.setAttribute('tone', dark ? 'dark' : 'color');
+            });
+          renderAll();
         });
         if (
           window.matchMedia &&
