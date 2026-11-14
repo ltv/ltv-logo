@@ -139,6 +139,14 @@ even without the stylesheet.
   `CONVERGE_ANIMATIONS` / `LEGACY_ANIMATIONS` for flat lists.
 - `ltv-logo-vue` requires Vue 3.3+ (see its README).
 
+## Brand assets
+
+`brand/` holds ready-made logo files for every surface: SVG and PNG marks,
+wordmark and lockups, favicons and web manifest, Open Graph image, social
+avatars and covers, and iOS / Android app icons. They are generated from the
+mark geometry in `ltv-logo-js` with `bun run brand`; see
+[`brand/README.md`](./brand/README.md) for which file to use where.
+
 ## Development
 
 This is a [Bun](https://bun.sh) workspace monorepo.

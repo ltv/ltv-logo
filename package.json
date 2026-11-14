@@ -19,11 +19,16 @@
     "dev:vue": "bun --cwd packages/ltv-logo-vue dev",
     "dev:react": "bun --cwd packages/ltv-logo-react dev",
     "version:bump": "bun scripts/bump-version.ts",
-    "playground": "bun run --filter ltv-logo-js build && bun scripts/playground.ts"
+    "playground": "bun run --filter ltv-logo-js build && bun scripts/playground.ts",
+    "brand": "bun scripts/brand-assets.ts"
   },
   "devDependencies": {
+    "@fontsource/ibm-plex-sans": "5.3.0",
+    "@fontsource/sora": "5.3.0",
     "@happy-dom/global-registrator": "^21.0.4",
+    "@resvg/resvg-js": "2.6.2",
     "@types/bun": "^1.4.4",
+    "opentype.js": "2.0.0",
     "prettier": "^3.10.1",
     "typescript": "^7.0.2"
   }
