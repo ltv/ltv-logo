@@ -12,7 +12,7 @@ import LtvLogo from 'ltv-logo-vue';
 </script>
 
 <template>
-  <LtvLogo :size="5" animation="intro" />
+  <LtvLogo :size="5" animation="greet" />
 </template>
 ```
 
@@ -27,8 +27,10 @@ createApp(App).use(LtvLogoPlugin).mount('#app'); // <LtvLogo> / <ltv-logo>
 
 Props:
 
-- `size` — `1`…`10`, default `5`
-- `animation` — `pulse` (default), `assemble`, `float`, `intro`, `wave`, `hover`, `none`
+- `mark` — `converge` (Hội tụ, default) or `legacy` (the 1.x L·T·V mark)
+- `size` — `1`…`10`, default `5` (converge: size × 16 px)
+- `tone` — converge only: `color` (default), `dark`, `mono`, `white`
+- `animation` — converge: `assemble` (default), `idle`, `greet`, `cheer`, `work`, `hover`, `none`; legacy: `pulse` (default), `assemble`, `float`, `intro`, `wave`, `hover`, `none`
 - `title` — accessible name, default `"LTV"`; `""` hides it from assistive tech
 
 Styles are injected on mount. For SSR you can also import

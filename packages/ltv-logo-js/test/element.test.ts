@@ -12,14 +12,21 @@ describe('<ltv-logo> custom element', () => {
     document.body.appendChild(el);
 
     const svg = el.querySelector('svg')!;
-    expect(svg.getAttribute('class')).toBe('logo size-3');
+    expect(svg.getAttribute('class')).toBe(
+      'ltv-mark ltv-anim-assemble ltv-tone-color'
+    );
+    expect(svg.getAttribute('width')).toBe('48');
     expect(document.getElementById(STYLE_ELEMENT_ID)).not.toBeNull();
 
-    el.setAttribute('size', '9');
-    expect(svg.getAttribute('class')).toBe('logo size-9');
+    el.setAttribute('animation', 'greet');
+    el.setAttribute('tone', 'dark');
+    expect(svg.getAttribute('class')).toBe(
+      'ltv-mark ltv-anim-greet ltv-tone-dark'
+    );
 
+    el.setAttribute('mark', 'legacy');
     el.setAttribute('animation', 'wave');
-    expect(svg.getAttribute('class')).toBe('logo size-9 logo-anim-wave');
+    expect(svg.getAttribute('class')).toBe('logo size-3 logo-anim-wave');
 
     el.setAttribute('label', 'LTV Co., Ltd');
     expect(svg.getAttribute('aria-label')).toBe('LTV Co., Ltd');

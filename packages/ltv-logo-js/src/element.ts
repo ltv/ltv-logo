@@ -1,15 +1,19 @@
 import {
   createLogoElement,
-  normalizeAnimation,
+  normalizeMark,
   updateLogoElement
 } from './render.js';
+import type { LogoOptions } from './render.js';
+import type { LogoAnimation, LogoTone } from './constants.js';
 import { injectStyles } from './styles.js';
 
 export const DEFAULT_TAG_NAME = 'ltv-logo';
 
 /**
- * Registers the `<ltv-logo size="5" animation="wave"></ltv-logo>` custom
- * element. Attributes: `size` (1–10), `animation`, `label`.
+ * Registers the `<ltv-logo>` custom element, e.g.
+ * `<ltv-logo size="5" animation="greet"></ltv-logo>`.
+ * Attributes: `mark` (`converge` | `legacy`), `size` (1–10), `animation`,
+ * `tone` (`color` | `dark` | `mono` | `white`), `label`.
  * Returns the element class. Calling it again is a no-op.
  */
 export function defineLtvLogoElement(
@@ -20,7 +24,7 @@ export function defineLtvLogoElement(
   if (existing) return existing;
 
   class LtvLogoElement extends HTMLElement {
-    static observedAttributes = ['size', 'animation', 'label'];
+    static observedAttributes = ['mark', 'size', 'animation', 'tone', 'label'];
     #svg: SVGSVGElement | null = null;
 
     connectedCallback(): void {
@@ -44,10 +48,13 @@ export function defineLtvLogoElement(
       else this.setAttribute('size', String(value));
     }
 
-    #options() {
+    #options(): LogoOptions {
       return {
+        mark: normalizeMark(this.getAttribute('mark')),
         size: this.getAttribute('size') ?? undefined,
-        animation: normalizeAnimation(this.getAttribute('animation')),
+        animation: (this.getAttribute('animation') ?? undefined) as
+          LogoAnimation | undefined,
+        tone: (this.getAttribute('tone') ?? undefined) as LogoTone | undefined,
         title: this.getAttribute('label') ?? undefined
       };
     }

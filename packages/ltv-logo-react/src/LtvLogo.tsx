@@ -1,35 +1,57 @@
-import { useInsertionEffect } from 'react';
-import type { SVGProps } from 'react';
-import {
-  DEFAULT_SIZE,
-  LOGO_LETTERS,
-  SVG_NS,
-  getLogoA11yAttributes,
-  getLogoClass,
-  injectStyles
-} from 'ltv-logo-js';
-import type { LogoAnimation } from 'ltv-logo-js';
+import { createElement, useInsertionEffect } from 'react';
+import type { ReactElement, SVGProps } from 'react';
+import { DEFAULT_SIZE, getLogoTree, injectStyles } from 'ltv-logo-js';
+import type { LogoAnimation, LogoMark, LogoNode, LogoTone } from 'ltv-logo-js';
 
 export interface LtvLogoProps extends Omit<
   SVGProps<SVGSVGElement>,
-  'children'
+  'children' | 'mark'
 > {
-  /** Logo size from 1 (smallest) to 10 (largest). Defaults to 5. */
+  /** `converge` (the Hội tụ mark, default) or `legacy` (the L·T·V mark). */
+  mark?: LogoMark;
+  /** Size from 1 (smallest) to 10 (largest). Converge: size × 16 px. */
   size?: number | string;
-  /** `pulse` (default), `assemble`, `float`, `intro`, `wave`, `hover` or `none`. */
+  /**
+   * Converge: `assemble` (default), `idle`, `greet`, `cheer`, `work`,
+   * `hover`, `none`. Legacy: `pulse` (default), `assemble`, `float`,
+   * `intro`, `wave`, `hover`, `none`.
+   */
   animation?: LogoAnimation;
+  /** Converge only: `color` (default), `dark`, `mono`, `white`. */
+  tone?: LogoTone;
   /** Accessible label. Use an empty string to hide it from assistive tech. */
   title?: string;
 }
 
+/** SVG attribute names → React prop names (`stroke-width` → `strokeWidth`). */
+const toReactProp = (name: string) => {
+  if (name === 'class') return 'className';
+  if (name.startsWith('aria-') || name.startsWith('data-')) return name;
+  return name.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
+};
+
+const toReactProps = (attrs: Record<string, string>) =>
+  Object.fromEntries(
+    Object.entries(attrs).map(([name, value]) => [toReactProp(name), value])
+  );
+
+const toElement = (node: LogoNode, key?: number): ReactElement =>
+  createElement(
+    node.tag,
+    { key, ...toReactProps(node.attrs) },
+    ...node.children.map((child, i) => toElement(child, i))
+  );
+
 /**
- * `<LtvLogo size={5} animation="intro" />` — the animated LTV logo for React.
+ * `<LtvLogo size={5} animation="greet" />` — the animated LTV logo for React.
  * Styles are injected automatically; `ref` and other SVG props are forwarded.
  */
 export function LtvLogo({
+  mark,
   size = DEFAULT_SIZE,
-  title = 'LTV',
   animation,
+  tone,
+  title = 'LTV',
   className,
   ...rest
 }: LtvLogoProps) {
@@ -37,21 +59,10 @@ export function LtvLogo({
     injectStyles();
   }, []);
 
-  return (
-    <svg
-      xmlns={SVG_NS}
-      className={getLogoClass(size, className, animation)}
-      {...getLogoA11yAttributes(title)}
-      {...rest}
-    >
-      <g className="logo-wrapper">
-        {LOGO_LETTERS.map((letter) => (
-          <g key={letter} className={`logo-letter ${letter}`}>
-            <rect />
-            <rect />
-          </g>
-        ))}
-      </g>
-    </svg>
+  const tree = getLogoTree({ mark, size, animation, tone, title, className });
+  return createElement(
+    'svg',
+    { ...toReactProps(tree.attrs), ...rest },
+    ...tree.children.map((child, i) => toElement(child, i))
   );
 }

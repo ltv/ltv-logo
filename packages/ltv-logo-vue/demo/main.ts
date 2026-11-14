@@ -1,16 +1,31 @@
 import { createApp, h } from 'vue';
-import { LOGO_ANIMATIONS, LtvLogo } from '../src/index.ts';
+import {
+  CONVERGE_ANIMATIONS,
+  LEGACY_ANIMATIONS,
+  LtvLogo
+} from '../src/index.ts';
+
+const cell = (mark: 'converge' | 'legacy', animation: string) =>
+  h('div', { key: `${mark}-${animation}` }, [
+    h('p', `${mark} · ${animation}`),
+    h(LtvLogo, {
+      mark,
+      size: mark === 'legacy' ? 4 : 5,
+      animation: animation as never
+    })
+  ]);
 
 createApp({
-  render: () =>
+  render: () => [
     h(
       'div',
       { class: 'row' },
-      LOGO_ANIMATIONS.map((animation) =>
-        h('div', { key: animation }, [
-          h('p', animation),
-          h(LtvLogo, { size: 4, animation })
-        ])
-      )
+      CONVERGE_ANIMATIONS.map((a) => cell('converge', a))
+    ),
+    h(
+      'div',
+      { class: 'row' },
+      LEGACY_ANIMATIONS.map((a) => cell('legacy', a))
     )
+  ]
 }).mount('#app');

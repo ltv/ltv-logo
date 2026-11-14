@@ -1,31 +1,46 @@
 import { defineComponent, h, onMounted } from 'vue';
-import type { PropType } from 'vue';
+import type { PropType, VNode } from 'vue';
 import {
-  DEFAULT_ANIMATION,
+  DEFAULT_MARK,
   DEFAULT_SIZE,
-  LOGO_LETTERS,
-  getLogoA11yAttributes,
-  getLogoClass,
+  getLogoTree,
   injectStyles
 } from 'ltv-logo-js';
-import type { LogoAnimation } from 'ltv-logo-js';
+import type { LogoAnimation, LogoMark, LogoNode, LogoTone } from 'ltv-logo-js';
+
+const toVNode = (node: LogoNode): VNode =>
+  h(node.tag, { ...node.attrs }, node.children.map(toVNode));
 
 /**
- * `<LtvLogo :size="5" animation="intro" />` — the animated LTV logo for Vue 3.
+ * `<LtvLogo :size="5" animation="greet" />` — the animated LTV logo for Vue 3.
  * Styles are injected automatically on mount.
  */
 export const LtvLogo = defineComponent({
   name: 'LtvLogo',
   props: {
-    /** Logo size from 1 (smallest) to 10 (largest). */
+    /** `converge` (the Hội tụ mark, default) or `legacy` (the L·T·V mark). */
+    mark: {
+      type: String as PropType<LogoMark>,
+      default: DEFAULT_MARK
+    },
+    /** Size from 1 (smallest) to 10 (largest). Converge: size × 16 px. */
     size: {
       type: [Number, String] as PropType<number | string>,
       default: DEFAULT_SIZE
     },
-    /** `pulse` (default), `assemble`, `float`, `intro`, `wave`, `hover` or `none`. */
+    /**
+     * Converge: `assemble` (default), `idle`, `greet`, `cheer`, `work`,
+     * `hover`, `none`. Legacy: `pulse` (default), `assemble`, `float`,
+     * `intro`, `wave`, `hover`, `none`.
+     */
     animation: {
       type: String as PropType<LogoAnimation>,
-      default: DEFAULT_ANIMATION
+      default: undefined
+    },
+    /** Converge only: `color` (default), `dark`, `mono`, `white`. */
+    tone: {
+      type: String as PropType<LogoTone>,
+      default: undefined
     },
     /** Accessible label. Use an empty string to hide it from assistive tech. */
     title: {
@@ -38,25 +53,14 @@ export const LtvLogo = defineComponent({
       injectStyles();
     });
     return () =>
-      h(
-        'svg',
-        {
-          xmlns: 'http://www.w3.org/2000/svg',
-          class: getLogoClass(props.size, undefined, props.animation),
-          ...getLogoA11yAttributes(props.title)
-        },
-        [
-          h(
-            'g',
-            { class: 'logo-wrapper' },
-            LOGO_LETTERS.map((letter) =>
-              h('g', { key: letter, class: `logo-letter ${letter}` }, [
-                h('rect'),
-                h('rect')
-              ])
-            )
-          )
-        ]
+      toVNode(
+        getLogoTree({
+          mark: props.mark,
+          size: props.size,
+          animation: props.animation,
+          tone: props.tone,
+          title: props.title
+        })
       );
   }
 });
