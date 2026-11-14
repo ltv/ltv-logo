@@ -1,6 +1,6 @@
 {
   "name": "ltv-logo-js",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "LTV animated logo for plain JavaScript / TypeScript (SVG string, DOM element and <ltv-logo> web component)",
   "keywords": [
     "ltv",

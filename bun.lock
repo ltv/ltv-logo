@@ -17,11 +17,11 @@
     },
     "packages/ltv-logo-js": {
       "name": "ltv-logo-js",
-      "version": "1.0.0",
+      "version": "2.0.0",
     },
     "packages/ltv-logo-react": {
       "name": "ltv-logo-react",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "dependencies": {
         "ltv-logo-js": "workspace:*",
       },
@@ -37,7 +37,7 @@
     },
     "packages/ltv-logo-vue": {
       "name": "ltv-logo-vue",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "dependencies": {
         "ltv-logo-js": "workspace:*",
       },
