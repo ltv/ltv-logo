@@ -25,6 +25,7 @@ needs to be installed. Wordmark: Sora 700. Taglines: IBM Plex Sans 500.
 | Social profile picture | `social/avatar-400.png` (`-1024` for high-res; `-dark` on navy) |
 | Social covers | `social/x-header-1500x500.png`, `social/linkedin-banner-1584x396.png`, `social/facebook-cover-1640x624.png` |
 | Link previews (Open Graph / X card) | `web/og-image.png` (1200 × 630) |
+| Google Workspace logo (Admin › Account settings › Personalization) | `web/google-workspace-320x132.png` (exactly 320 × 132, transparent; `-white` has a white background) |
 | iOS app | `ios/AppIcon.appiconset/` — drop into an Xcode asset catalog (light, dark, tinted) |
 | Android app | `android/` — copy into `app/src/main/res/` (adaptive icon with monochrome layer, plus legacy icons) |
 | Google Play listing | `android/play-store-512.png` |

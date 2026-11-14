@@ -430,6 +430,28 @@ await write(
   `<?xml version="1.0" encoding="utf-8"?>\n<browserconfig>\n  <msapplication>\n    <tile>\n      <square150x150logo src="/mstile-150x150.png"/>\n      <TileColor>${COLORS.primary}</TileColor>\n    </tile>\n  </msapplication>\n</browserconfig>\n`
 );
 
+// Google Workspace (Admin console › Account settings › Personalization):
+// exactly 320 × 132 so Google does not stretch it; PNG ≤ 30 KB.
+for (const [suffix, background] of [
+  ['', undefined],
+  ['-white', WHITE]
+] as const) {
+  const l = lockupHorizontal('color');
+  const scale = Math.min(300 / l.w, 120 / l.h);
+  const w = l.w * scale;
+  const h = l.h * scale;
+  const inner = l.svg
+    .replace(/^<svg[^>]*>(<title>[^<]*<\/title>)?/, '')
+    .replace(/<\/svg>\s*$/, '');
+  const ws = svg(
+    320,
+    132,
+    `<g transform="translate(${n((320 - w) / 2)} ${n((132 - h) / 2)}) scale(${n(scale)})">${inner}</g>`,
+    background
+  );
+  await write(`web/google-workspace-320x132${suffix}.png`, png(ws, 320));
+}
+
 // Social
 await write('social/avatar-400.png', png(icon(400, 'color', 0.62, WHITE), 400));
 await write(
